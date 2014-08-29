@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Javascipt is Sexy</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body>
+	<div>
+		<h1 id="question"></h1>
+	</div>
+	<div>
+		<form id="Quiz">
+			<div id="answerSpace">
+			</div>
+			<input id="back" type="button" value="Back" onclick="deIncrementQuestion()" />
+			<input id="button" type="button" value="Next" onclick="incrementQuestion(qNo)" />
+		</form>
+	</div>
+
+	<script type="text/javascript">
+    	var numberCorrect = 0;
+    	var qNo = 0;
+
+		
+
+		//alert(allQuestions[0].question);
+
+ 
+    	var allQuestions = [
+    		{question: "'The Matrix' opens with a conversation, and a rather revealing one at that if one is paying attention. Which two characters have this introductory discussion?", choices: ["Trinity and Cypher", "Neo and Trinity", 
+    		"Trinity and Morpheus", "Morpheus and Cypher"], correctAnswer:0},
+    		{question: "After discovering that her phone line is tapped, Trinity is forced to escape from the truly wretched confines of the roach motel in which she is holed up. After contacting Morpheus, Trinity is instructed to reach a public phone on a street corner. The street corner is located at the intersection of which two streets?", choices: ["State and Indiana","University and Oxford","Wells and Lake","Market and Ash"], correctAnswer: 3},
+    		{question: "Neo, prompted by a tattoo he sees on the shoulder of Choi's lady friend, decides to join his visitors at a nearby nightclub. Here, he meets Trinity for the first time. While chatting with Trinity in the seedy nightclub, which performer's music plays in the background?", choices: ["Rage Against the Machine","Nine Inch Nails","Marilyn Manson","Rob Zombie"], correctAnswer: 3}
+
+			];
+
+
+
+		function startQuiz (questionNumber)
+		{
+			var question = allQuestions[questionNumber].question;
+			var element = document.getElementById("question");
+			element.innerHTML = question;
+			
+			for (i = 0; i < (allQuestions[questionNumber].choices).length; i++)
+			{
+				var option =  document.createElement("label");
+				option.innerHTML = allQuestions[questionNumber].choices[i];
+				var radioButton = document.createElement("input");
+				radioButton.id = i;
+				radioButton.type = "radio";
+				radioButton.value = i;
+				radioButton.name = "answer";
+				document.getElementById("answerSpace").appendChild(option);
+				document.getElementById("answerSpace").appendChild(radioButton);
+			}
+
+			/*if (qNo === 0)
+			{
+				document.getElementById("back").style.display = "none";
+			}*/
+
+			if (sessionStorage.getItem(qNo))
+			{
+				var selectedId = sessionStorage.getItem(qNo);
+				document.getElementById(selectedId).checked = true;
+			}
+
+		}
+
+		function deIncrementQuestion ()
+		{
+			if (qNo > 0)
+			{
+				qNo--;
+				mydiv = document.getElementById('answerSpace');
+				while ( mydiv.firstChild ) 
+					mydiv.removeChild( mydiv.firstChild );
+				startQuiz(qNo);
+			}
+			else
+			{
+				alert("You are at the start of the quiz");
+			}
+		}
+
+		function incrementQuestion (questionNumber)
+		{
+			var noSelected = 0;
+			//checks the answer that has been selected
+			var answers = document.getElementsByName('answer');
+			for (i = 0; i < answers.length; i++)
+			{
+				if (answers[i].checked)
+				{
+					noSelected++;
+					if (sessionStorage.getItem(qNo) === null)
+					{
+						//saves the selected radio button in session storage
+						sessionStorage.setItem(qNo,answers[i].value);
+						if (parseInt(answers[i].value) === allQuestions[questionNumber].correctAnswer)
+							numberCorrect++;
+					}	
+				}
+			}
+
+			//alert(sessionStorage.getItem("selected"));
+			//client side validation, executed if no answer is selected
+			if (noSelected === 0)
+			{
+				alert('pick an answer');
+				return;
+			}
+			
+			//displays the next question if you are not on the last question
+			if(qNo < allQuestions.length - 1)
+			{
+				mydiv = document.getElementById('answerSpace');
+				while ( mydiv.firstChild ) 
+					mydiv.removeChild( mydiv.firstChild );
+				qNo++;
+				startQuiz(qNo);
+			}
+			else
+			{
+				//when you have reached the end of the quiz, this code gets executed.
+				document.getElementById("question").innerHTML = 'You got ' + numberCorrect + ' right.';
+				mydiv = document.getElementById('answerSpace');
+				while ( mydiv.firstChild ) 
+					mydiv.removeChild( mydiv.firstChild );
+				sessionStorage.clear();
+				//makes buttons disappear
+				document.getElementById("Quiz").style.display = "none";
+
+			}
+
+		}
+
+		startQuiz(qNo);
+	
+	
+    </script>
+
+  
+</body>
+</html>
